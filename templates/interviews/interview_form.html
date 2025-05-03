@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if title %}
+        {{ title }} - Sistema de Recrutamento
+    {% elif object %}
+        Atualizar Entrevista - Sistema de Recrutamento
+    {% else %}
+        Agendar Entrevista - Sistema de Recrutamento
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-3">
+                {% if title %}
+                    {{ title }}
+                {% elif object %}
+                    Atualizar Entrevista
+                {% else %}
+                    Agendar Entrevista
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        {% if object %}
+                            Detalhes da Entrevista
+                        {% else %}
+                            Nova Entrevista
+                        {% endif %}
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Informações da Candidatura/Candidato -->
+                    {% if application %}
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i data-feather="info" class="me-2"></i>
+                                </div>
+                                <div>
+                                    <strong>Agendando Entrevista Para:</strong>
+                                    <p class="mb-1">
+                                        {{ application.candidate.get_full_name|default:application.candidate.username }} 
+                                        para {{ application.job.title }} na {{ application.job.company }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Erro:</strong> Por favor, corrija os erros abaixo.
+                                <ul>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Tipo e Hora da Entrevista -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ form.interview_type.id_for_label }}" class="form-label">Tipo de Entrevista *</label>
+                                {{ form.interview_type }}
+                                {% if form.interview_type.errors %}
+                                    <div class="text-danger small mt-1">{{ form.interview_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">Status *</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ form.date_time.id_for_label }}" class="form-label">Data e Hora *</label>
+                                {{ form.date_time }}
+                                {% if form.date_time.errors %}
+                                    <div class="text-danger small mt-1">{{ form.date_time.errors }}</div>
+                                {% else %}
+                                    <div class="form-text">Quando a entrevista ocorrerá</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.duration_minutes.id_for_label }}" class="form-label">Duração (minutos) *</label>
+                                {{ form.duration_minutes }}
+                                {% if form.duration_minutes.errors %}
+                                    <div class="text-danger small mt-1">{{ form.duration_minutes.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">Local/Link da Reunião</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="text-danger small mt-1">{{ form.location.errors }}</div>
+                            {% else %}
+                                <div class="form-text">Local físico ou link para reunião virtual</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notas</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger small mt-1">{{ form.notes.errors }}</div>
+                            {% else %}
+                                <div class="form-text">Qualquer informação adicional sobre a entrevista</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if application %}{% url 'application_detail' application.id %}{% elif object %}{% url 'interview_detail' object.id %}{% else %}{% url 'my_interviews' %}{% endif %}" class="btn btn-outline-secondary">
+                                <i data-feather="x" class="me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save" class="me-1"></i> 
+                                {% if object %}Atualizar{% else %}Agendar{% endif %} Entrevista
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Aplicar estilos aos campos do formulário -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Adicionar classes do Bootstrap aos campos de entrada do formulário
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="datetime-local"]').forEach(function(input) {
+            input.classList.add('form-control');
+        });
+        
+        // Adicionar classes do Bootstrap aos campos de texto do formulário
+        document.querySelectorAll('textarea').forEach(function(textarea) {
+            textarea.classList.add('form-control');
+        });
+        
+        // Adicionar classes do Bootstrap aos campos de seleção do formulário
+        document.querySelectorAll('select').forEach(function(select) {
+            select.classList.add('form-select');
+        });
+    });
+</script>
+{% endblock %}

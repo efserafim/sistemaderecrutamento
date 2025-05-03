@@ -1,0 +1,79 @@
+/* Estilos simplificados para o Sistema de Recrutamento */
+
+/* Estilos base */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #fff;
+}
+
+/* Alinhamento de ícones */
+.feather {
+    vertical-align: middle;
+}
+
+/* Cards */
+.card {
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Navegação */
+.navbar {
+    margin-bottom: 20px;
+}
+
+.navbar-brand .feather {
+    margin-right: 0.5rem;
+}
+
+/* Utilitários */
+.feather-small {
+    width: 16px;
+    height: 16px;
+}
+
+/* Badges */
+.badge {
+    font-weight: normal;
+}
+
+/* Formulários */
+.form-label {
+    font-weight: bold;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 4px;
+}
+
+/* Footer */
+footer {
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+}
+
+/* Simplificação de elementos de entrevista e aplicação */
+.timeline {
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+.job-description, .job-requirements {
+    line-height: 1.5;
+}

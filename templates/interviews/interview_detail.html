@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Entrevista - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'my_interviews' %}">Entrevistas</a></li>
+                    <li class="breadcrumb-item active">Detalhes da Entrevista</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ interview.get_interview_type_display }}</h4>
+                        <span class="badge 
+                            {% if interview.status == 'SCHEDULED' %}bg-info
+                            {% elif interview.status == 'COMPLETED' %}bg-success
+                            {% elif interview.status == 'CANCELED' %}bg-danger
+                            {% elif interview.status == 'RESCHEDULED' %}bg-warning
+                            {% endif %} p-2">
+                            {{ interview.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Detalhes da Entrevista</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Vaga:</strong>
+                                <p>{{ interview.application.job.title }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Empresa:</strong>
+                                <p>{{ interview.application.job.company }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Data e Hora:</strong>
+                                <p>{{ interview.date_time|date:"d de F, Y - h:i A" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Duração:</strong>
+                                <p>{{ interview.duration_minutes }} minutos</p>
+                            </div>
+                        </div>
+                        
+                        {% if interview.location %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <strong>Local/Link da Reunião:</strong>
+                                    <p>{{ interview.location }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if is_recruiter %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Candidato:</strong>
+                                    <p>{{ interview.application.candidate.get_full_name|default:interview.application.candidate.username }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Email do Candidato:</strong>
+                                    <p>{{ interview.application.candidate.email }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if is_candidate %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Recrutador:</strong>
+                                    <p>{{ interview.application.job.recruiter.get_full_name|default:interview.application.job.recruiter.username }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Email do Recrutador:</strong>
+                                    <p>{{ interview.application.job.recruiter.email }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if interview.notes %}
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Notas</h5>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    {{ interview.notes|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if interview.feedback and interview.status == 'COMPLETED' %}
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Feedback</h5>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    {{ interview.feedback|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if is_recruiter and interview.is_past and not interview.feedback and interview.status != 'CANCELED' %}
+                        <div class="alert alert-info">
+                            <p class="mb-2">Esta entrevista já ocorreu. Gostaria de adicionar um feedback?</p>
+                            <a href="{% url 'add_feedback' interview.id %}" class="btn btn-primary btn-sm">
+                                <i data-feather="message-square" class="me-1"></i> Adicionar Feedback
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'my_interviews' %}" class="btn btn-outline-secondary">
+                            <i data-feather="arrow-left" class="me-1"></i> Voltar para Entrevistas
+                        </a>
+                        
+                        <div class="btn-group">
+                            {% if is_recruiter and interview.status == 'SCHEDULED' %}
+                                <a href="{% url 'interview_update' interview.id %}" class="btn btn-outline-primary">
+                                    <i data-feather="edit-2" class="me-1"></i> Atualizar
+                                </a>
+                                <a href="{% url 'cancel_interview' interview.id %}" class="btn btn-outline-danger">
+                                    <i data-feather="x" class="me-1"></i> Cancelar
+                                </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'application_detail' interview.application.id %}" class="btn btn-outline-info">
+                                <i data-feather="file-text" class="me-1"></i> Ver Candidatura
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Barra lateral com Calendário ou Informações de Status -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Calendário</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="calendar-month">
+                            <div class="month-header bg-light py-2 rounded mb-2">
+                                <h5 class="mb-0">{{ interview.date_time|date:"F Y" }}</h5>
+                            </div>
+                            <div class="calendar-date border rounded p-3 mb-3">
+                                <div class="display-4 fw-bold">{{ interview.date_time|date:"d" }}</div>
+                                <div>{{ interview.date_time|date:"l" }}</div>
+                            </div>
+                            <div class="time-display bg-light py-2 rounded">
+                                <div class="fs-4">{{ interview.date_time|date:"h:i A" }}</div>
+                                <div class="text-muted">{{ interview.duration_minutes }} minutos</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Contagem Regressiva para a Entrevista / Status -->
+                    {% if interview.status == 'SCHEDULED' %}
+                        <div class="text-center mt-3">
+                            {% if interview.is_past %}
+                                <div class="alert alert-warning">
+                                    <i data-feather="alert-triangle" class="me-1"></i>
+                                    Esta entrevista foi agendada para o passado.
+                                </div>
+                            {% else %}
+                                <h6>Tempo até a Entrevista</h6>
+                                <div class="countdown-timer" data-interview-time="{{ interview.date_time|date:'c' }}">
+                                    <div class="countdown-display">
+                                        <div id="countdown-days" class="fs-5">-</div>
+                                        <small>Dias</small>
+                                    </div>
+                                    <div class="countdown-display">
+                                        <div id="countdown-hours" class="fs-5">-</div>
+                                        <small>Horas</small>
+                                    </div>
+                                    <div class="countdown-display">
+                                        <div id="countdown-minutes" class="fs-5">-</div>
+                                        <small>Minutos</small>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% elif interview.status == 'COMPLETED' %}
+                        <div class="alert alert-success mt-3">
+                            <i data-feather="check-circle" class="me-1"></i>
+                            Esta entrevista foi concluída.
+                        </div>
+                    {% elif interview.status == 'CANCELED' %}
+                        <div class="alert alert-danger mt-3">
+                            <i data-feather="x-circle" class="me-1"></i>
+                            Esta entrevista foi cancelada.
+                        </div>
+                    {% elif interview.status == 'RESCHEDULED' %}
+                        <div class="alert alert-warning mt-3">
+                            <i data-feather="alert-circle" class="me-1"></i>
+                            Esta entrevista foi reagendada.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Para recrutadores: ações rápidas -->
+            {% if is_recruiter and interview.status == 'SCHEDULED' %}
+                <div class="card shadow">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Ações Rápidas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'interview_update' interview.id %}" class="btn btn-outline-primary">
+                                <i data-feather="edit-2" class="me-1"></i> Reagendar Entrevista
+                            </a>
+                            <a href="{% url 'cancel_interview' interview.id %}" class="btn btn-outline-danger">
+                                <i data-feather="x" class="me-1"></i> Cancelar Entrevista
+                            </a>
+                            <a href="{% url 'application_detail' interview.application.id %}" class="btn btn-outline-secondary">
+                                <i data-feather="file-text" class="me-1"></i> Revisar Candidatura
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Script de Contagem Regressiva -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countdownElement = document.querySelector('.countdown-timer');
+        if (countdownElement) {
+            const interviewTime = new Date(countdownElement.dataset.interviewTime);
+            
+            function updateCountdown() {
+                const now = new Date();
+                const diff = interviewTime - now;
+                
+                if (diff <= 0) {
+                    document.getElementById('countdown-days').textContent = '0';
+                    document.getElementById('countdown-hours').textContent = '0';
+                    document.getElementById('countdown-minutes').textContent = '0';
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                document.getElementById('countdown-days').textContent = days;
+                document.getElementById('countdown-hours').textContent = hours;
+                document.getElementById('countdown-minutes').textContent = minutes;
+            }
+            
+            updateCountdown();
+            setInterval(updateCountdown, 60000); // Atualiza a cada minuto
+        }
+    });
+</script>
+{% endblock %}

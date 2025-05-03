@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Recruitment System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Your Profile</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Account Info</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="profile-icon d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 100px; height: 100px;">
+                            <i data-feather="user" style="width: 50px; height: 50px;"></i>
+                        </div>
+                        <h5>{{ user.get_full_name|default:user.username }}</h5>
+                        <p class="text-muted">{{ user.get_role_display }}</p>
+                    </div>
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Username:</strong> <span>{{ user.username }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Email:</strong> <span>{{ user.email }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Member since:</strong> <span>{{ user.date_joined|date:"M d, Y" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Edit Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <h5 class="border-bottom pb-2 mb-3">Personal Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                {{ user_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                {{ user_form.last_name }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ user_form.username.id_for_label }}" class="form-label">Username</label>
+                                {{ user_form.username }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ user_form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ user_form.email }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ user_form.phone.id_for_label }}" class="form-label">Phone</label>
+                            {{ user_form.phone }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ user_form.bio.id_for_label }}" class="form-label">Bio</label>
+                            {{ user_form.bio }}
+                        </div>
+                        
+                        {% if profile_form %}
+                            {% if user.is_candidate %}
+                                <h5 class="border-bottom pb-2 mb-3 mt-4">Candidate Information</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.resume.id_for_label }}" class="form-label">Resume</label>
+                                    {{ profile_form.resume }}
+                                    <div class="form-text">Describe your professional experience and qualifications.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.skills.id_for_label }}" class="form-label">Skills</label>
+                                    {{ profile_form.skills }}
+                                    <div class="form-text">List your skills separated by commas.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.experience.id_for_label }}" class="form-label">Years of Experience</label>
+                                    {{ profile_form.experience }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.education.id_for_label }}" class="form-label">Education</label>
+                                    {{ profile_form.education }}
+                                </div>
+                                
+                            {% elif user.is_recruiter %}
+                                <h5 class="border-bottom pb-2 mb-3 mt-4">Recruiter Information</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.company.id_for_label }}" class="form-label">Company</label>
+                                    {{ profile_form.company }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.position.id_for_label }}" class="form-label">Position</label>
+                                    {{ profile_form.position }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.department.id_for_label }}" class="form-label">Department</label>
+                                    {{ profile_form.department }}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apply styles to form fields -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add Bootstrap classes to form inputs
+        document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], input[type="tel"]').forEach(function(input) {
+            input.classList.add('form-control');
+        });
+        
+        // Add Bootstrap classes to form textareas
+        document.querySelectorAll('textarea').forEach(function(textarea) {
+            textarea.classList.add('form-control');
+        });
+        
+        // Add Bootstrap classes to form select fields
+        document.querySelectorAll('select').forEach(function(select) {
+            select.classList.add('form-select');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Saída - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Saída Concluída</h3>
+            </div>
+            <div class="card-body text-center">
+                <div class="my-4">
+                    <i data-feather="log-out" style="width: 72px; height: 72px;"></i>
+                </div>
+                
+                <h4 class="mb-3">Você saiu do sistema com sucesso</h4>
+                <p class="mb-4">Obrigado por utilizar nosso sistema de recrutamento.</p>
+                
+                <a href="{% url 'login' %}" class="btn btn-primary">
+                    <i data-feather="log-in" class="me-1"></i> Entrar Novamente
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

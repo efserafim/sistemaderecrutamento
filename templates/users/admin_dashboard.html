@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard do Administrador - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Dashboard do Administrador</h1>
+        </div>
+    </div>
+    
+    <!-- Cartões de Estatísticas do Sistema -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-5 border-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Usuários
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_users }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i data-feather="users" class="text-muted" style="width: 32px; height: 32px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-5 border-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Candidatos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ candidate_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i data-feather="user" class="text-muted" style="width: 32px; height: 32px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-5 border-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Recrutadores
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recruiter_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i data-feather="briefcase" class="text-muted" style="width: 32px; height: 32px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-5 border-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Administradores
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ admin_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i data-feather="shield" class="text-muted" style="width: 32px; height: 32px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações Administrativas -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Ações Administrativas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="d-grid">
+                                <a href="{% url 'user_management' %}" class="btn btn-outline-primary">
+                                    <i data-feather="users" class="me-2"></i> Gerenciamento de Usuários
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="d-grid">
+                                <a href="/admin/jobs/job/" class="btn btn-outline-primary">
+                                    <i data-feather="briefcase" class="me-2"></i> Gerenciar Vagas de Emprego
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="d-grid">
+                                <a href="/admin/interviews/interview/" class="btn btn-outline-primary">
+                                    <i data-feather="calendar" class="me-2"></i> Gerenciar Entrevistas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Atividade do Sistema -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Informações do Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Bem-vindo ao Dashboard do Administrador. A partir daqui, você pode gerenciar todos os aspectos do sistema de recrutamento.</p>
+                    <ul class="mt-3">
+                        <li>Visualize e gerencie contas de usuários</li>
+                        <li>Monitore postagens de vagas e aplicações</li>
+                        <li>Acompanhe os agendamentos de entrevistas</li>
+                        <li>Acesse a interface de administração do Django para funcionalidades avançadas</li>
+                    </ul>
+                    <div class="alert alert-info mt-3">
+                        <i data-feather="info" class="me-2"></i>
+                        <strong>Dica:</strong> Use a interface de administração do Django para operações mais avançadas e acesso direto ao banco de dados.
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/admin/" class="btn btn-sm btn-primary">
+                        <i data-feather="settings" class="me-1"></i> Interface de Administração do Django
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

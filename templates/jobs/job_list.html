@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_my_jobs %}
+        {{ title }} - Sistema de Recrutamento
+    {% else %}
+        Procurar Vagas - Sistema de Recrutamento
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-3">
+                {% if is_my_jobs %}
+                    {{ title }}
+                {% else %}
+                    Procurar Vagas
+                {% endif %}
+            </h1>
+            
+            {% if not is_my_jobs %}
+                <!-- Search and Filter Form -->
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <form method="GET" action="{% url 'job_list' %}" class="row g-3">
+                            <div class="col-md-5">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i data-feather="search"></i></span>
+                                    <input type="text" class="form-control" name="search" 
+                                           placeholder="Pesquisar por título, empresa, localização..." 
+                                           value="{{ search_query }}">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <select name="job_type" class="form-select">
+                                    <option value="">Todos os Tipos</option>
+                                    <option value="FULL_TIME" {% if job_type_filter == 'FULL_TIME' %}selected{% endif %}>Tempo Integral</option>
+                                    <option value="PART_TIME" {% if job_type_filter == 'PART_TIME' %}selected{% endif %}>Meio Período</option>
+                                    <option value="CONTRACT" {% if job_type_filter == 'CONTRACT' %}selected{% endif %}>Contrato</option>
+                                    <option value="INTERNSHIP" {% if job_type_filter == 'INTERNSHIP' %}selected{% endif %}>Estágio</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <select name="location" class="form-select">
+                                    <option value="">Todas as Localidades</option>
+                                    {% for location in locations %}
+                                        <option value="{{ location }}" {% if location_filter == location %}selected{% endif %}>{{ location }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% elif user.is_recruiter %}
+                <div class="mb-3">
+                    <a href="{% url 'job_create' %}" class="btn btn-primary">
+                        <i data-feather="plus" class="me-1"></i> Publicar Nova Vaga
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if not jobs %}
+        <div class="alert alert-info">
+            {% if is_my_jobs %}
+                <p class="mb-0">Você ainda não publicou nenhuma vaga.</p>
+            {% else %}
+                <p class="mb-0">Nenhuma vaga encontrada correspondente aos critérios.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <div class="row">
+        {% for job in jobs %}
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">{{ job.title }}</h5>
+                        <div class="small text-muted">{{ job.company }} • {{ job.location }}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <span class="badge bg-primary me-2">{{ job.get_job_type_display }}</span>
+                            {% if job.salary_range %}
+                                <span class="badge bg-success me-2">{{ job.salary_range }}</span>
+                            {% endif %}
+                            {% if job.is_active %}
+                                <span class="badge bg-success me-2">Ativa</span>
+                            {% else %}
+                                <span class="badge bg-danger me-2">Inativa</span>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="card-text">{{ job.description|truncatewords:25 }}</p>
+                        
+                        <div class="small text-muted mb-3">
+                            <div><i data-feather="calendar" class="feather-small me-1"></i> Publicada: {{ job.created_at|date:"d/m/Y" }}</div>
+                            <div><i data-feather="clock" class="feather-small me-1"></i> Prazo: {{ job.deadline|date:"d/m/Y" }}</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'job_detail' job.id %}" class="btn btn-outline-primary">Ver Detalhes</a>
+                            
+                            {% if is_my_jobs %}
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ job.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Ações
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ job.id }}">
+                                        <li><a class="dropdown-item" href="{% url 'job_update' job.id %}">Editar Vaga</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'view_applications' job.id %}">Ver Candidaturas{% if job.application_count %} ({{ job.application_count }}){% endif %}</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="POST" action="{% url 'toggle_job_status' job.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item text-{% if job.is_active %}warning{% else %}success{% endif %}">
+                                                    {% if job.is_active %}Desativar{% else %}Ativar{% endif %} Vaga
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% elif user.is_authenticated and user.is_candidate %}
+                                {% if job.id in applied_jobs %}
+                                    <span class="badge bg-success p-2">Já Candidatado</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter }}{% endif %}{% if location_filter %}&location={{ location_filter }}{% endif %}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Adjust icon sizes
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.feather-small').forEach(icon => {
+            icon.setAttribute('width', '16');
+            icon.setAttribute('height', '16');
+        });
+    });
+</script>
+{% endblock %}

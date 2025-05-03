@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Candidatura - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {% if is_recruiter %}
+                        <li class="breadcrumb-item"><a href="{% url 'view_applications' application.job.id %}">Candidaturas</a></li>
+                    {% else %}
+                        <li class="breadcrumb-item"><a href="{% url 'my_applications' %}">Minhas Candidaturas</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active">Detalhes da Candidatura</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Candidatura para {{ application.job.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <h5 class="card-title">{{ application.job.company }}</h5>
+                            <p class="text-muted">{{ application.job.location }}</p>
+                        </div>
+                        <div>
+                            <span class="badge 
+                                {% if application.status == 'APPLIED' %}bg-secondary
+                                {% elif application.status == 'REVIEWING' %}bg-info
+                                {% elif application.status == 'SHORTLISTED' %}bg-primary
+                                {% elif application.status == 'REJECTED' %}bg-danger
+                                {% elif application.status == 'HIRED' %}bg-success
+                                {% endif %} p-2">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <strong>Candidatado em:</strong>
+                            <p>{{ application.applied_at|date:"d de F, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Última Atualização:</strong>
+                            <p>{{ application.updated_at|date:"d de F, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if is_recruiter %}
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Informações do Candidato</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Nome:</strong>
+                                    <p>{{ application.candidate.get_full_name|default:application.candidate.username }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Email:</strong>
+                                    <p>{{ application.candidate.email }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if application.candidate.candidate_profile %}
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <strong>Experiência:</strong>
+                                        <p>{{ application.candidate.candidate_profile.experience }} anos</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Telefone:</strong>
+                                        <p>{{ application.candidate.phone|default:"Não informado" }}</p>
+                                    </div>
+                                </div>
+                                
+                                {% if application.candidate.candidate_profile.skills %}
+                                    <div class="mt-2">
+                                        <strong>Habilidades:</strong>
+                                        <p>{{ application.candidate.candidate_profile.skills }}</p>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if application.candidate.candidate_profile.education %}
+                                    <div class="mt-2">
+                                        <strong>Educação:</strong>
+                                        <p>{{ application.candidate.candidate_profile.education }}</p>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if application.candidate.candidate_profile.resume %}
+                                    <div class="mt-2">
+                                        <strong>Currículo:</strong>
+                                        <div class="card mt-2">
+                                            <div class="card-body bg-light">
+                                                {{ application.candidate.candidate_profile.resume|linebreaks }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Carta de Apresentação</h5>
+                        <div class="card">
+                            <div class="card-body bg-light">
+                                {{ application.cover_letter|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if is_recruiter and application.recruiter_notes %}
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Notas do Recrutador</h5>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    {{ application.recruiter_notes|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Seção de Entrevistas -->
+                    {% if application.interviews.exists %}
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                Entrevistas
+                                {% if is_recruiter %}
+                                    <a href="{% url 'schedule_interview' application.id %}" class="btn btn-sm btn-outline-primary float-end">
+                                        <i data-feather="plus" class="me-1" style="width: 14px; height: 14px;"></i> Agendar Entrevista
+                                    </a>
+                                {% endif %}
+                            </h5>
+                            
+                            <div class="list-group">
+                                {% for interview in application.interviews.all %}
+                                    <a href="{% url 'interview_detail' interview.id %}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ interview.get_interview_type_display }}</h6>
+                                            <span class="badge 
+                                                {% if interview.status == 'SCHEDULED' %}bg-primary
+                                                {% elif interview.status == 'COMPLETED' %}bg-success
+                                                {% elif interview.status == 'CANCELED' %}bg-danger
+                                                {% elif interview.status == 'RESCHEDULED' %}bg-warning
+                                                {% endif %}">
+                                                {{ interview.get_status_display }}
+                                            </span>
+                                        </div>
+                                        <p class="mb-1">
+                                            <i data-feather="calendar" class="feather-small me-1"></i> 
+                                            {{ interview.date_time|date:"d de F, Y - h:i A" }}
+                                            ({{ interview.duration_minutes }} minutos)
+                                        </p>
+                                        {% if interview.location %}
+                                            <small>
+                                                <i data-feather="map-pin" class="feather-small me-1"></i> 
+                                                {{ interview.location }}
+                                            </small>
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% elif is_recruiter %}
+                        <div class="d-grid mb-4">
+                            <a href="{% url 'schedule_interview' application.id %}" class="btn btn-outline-primary">
+                                <i data-feather="calendar" class="me-1"></i> Agendar Entrevista
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        {% if is_recruiter %}
+                            <a href="{% url 'view_applications' application.job.id %}" class="btn btn-outline-secondary">
+                                <i data-feather="arrow-left" class="me-1"></i> Voltar para Candidaturas
+                            </a>
+                        {% else %}
+                            <a href="{% url 'my_applications' %}" class="btn btn-outline-secondary">
+                                <i data-feather="arrow-left" class="me-1"></i> Voltar para Minhas Candidaturas
+                            </a>
+                        {% endif %}
+                        
+                        {% if is_recruiter %}
+                            <a href="{% url 'job_detail' application.job.id %}" class="btn btn-outline-primary">
+                                <i data-feather="briefcase" class="me-1"></i> Ver Vaga
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Barra lateral para Atualizações de Status (Somente Recrutadores) -->
+        {% if is_recruiter %}
+            <div class="col-md-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Atualizar Status da Candidatura</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                                {{ form.status }}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.recruiter_notes.id_for_label }}" class="form-label">Notas</label>
+                                {{ form.recruiter_notes }}
+                                <div class="form-text">Notas privadas sobre este candidato</div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="save" class="me-1"></i> Salvar Alterações
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card shadow">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Linha do Tempo da Candidatura</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="timeline">
+                            <li class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Candidatura Enviada</h6>
+                                    <p class="timeline-date">{{ application.applied_at|date:"d de F, Y" }}</p>
+                                </div>
+                            </li>
+                            
+                            {% if application.status != 'APPLIED' %}
+                                <li class="timeline-item">
+                                    <div class="timeline-marker bg-info"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Em Análise</h6>
+                                        <p class="timeline-date">Status atualizado</p>
+                                    </div>
+                                </li>
+                            {% endif %}
+                            
+                            {% if application.status == 'SHORTLISTED' or application.status == 'REJECTED' or application.status == 'HIRED' %}
+                                <li class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Pré-selecionado</h6>
+                                        <p class="timeline-date">Candidato selecionado para consideração</p>
+                                    </div>
+                                </li>
+                            {% endif %}
+                            
+                            {% if application.interviews.exists %}
+                                <li class="timeline-item">
+                                    <div class="timeline-marker bg-warning"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Entrevista Agendada</h6>
+                                        <p class="timeline-date">Primeira entrevista agendada</p>
+                                    </div>
+                                </li>
+                            {% endif %}
+                            
+                            {% if application.status == 'REJECTED' %}
+                                <li class="timeline-item">
+                                    <div class="timeline-marker bg-danger"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Candidatura Rejeitada</h6>
+                                        <p class="timeline-date">Decisão tomada</p>
+                                    </div>
+                                </li>
+                            {% endif %}
+                            
+                            {% if application.status == 'HIRED' %}
+                                <li class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Candidato Contratado</h6>
+                                        <p class="timeline-date">Oferta realizada</p>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Aplicar classes do Bootstrap aos elementos do formulário -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Adicionar classes do Bootstrap aos campos de seleção do formulário
+        document.querySelectorAll('select').forEach(function(select) {
+            select.classList.add('form-select');
+        });
+        
+        // Adicionar classes do Bootstrap aos campos de texto do formulário
+        document.querySelectorAll('textarea').forEach(function(textarea) {
+            textarea.classList.add('form-control');
+        });
+        
+        // Ajustar tamanhos dos ícones
+        document.querySelectorAll('.feather-small').forEach(icon => {
+            icon.setAttribute('width', '16');
+            icon.setAttribute('height', '16');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciamento de Usuários - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Gerenciamento de Usuários</h1>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Todos os Usuários</h5>
+                        <a href="/admin/users/customuser/add/" class="btn btn-sm btn-light">
+                            <i data-feather="plus" class="me-1"></i> Adicionar Novo Usuário
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Controles de Filtro -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" id="userSearch" class="form-control" placeholder="Pesquisar usuários...">
+                                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                    <i data-feather="search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="roleFilter" class="form-select">
+                                <option value="">Todos os Papéis</option>
+                                <option value="CANDIDATE">Candidato</option>
+                                <option value="RECRUITER">Recrutador</option>
+                                <option value="ADMIN">Administrador</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabela de Usuários -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nome de Usuário</th>
+                                    <th>Email</th>
+                                    <th>Nome Completo</th>
+                                    <th>Papel</th>
+                                    <th>Data de Entrada</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                {% for user in users %}
+                                <tr data-role="{{ user.role }}">
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.get_full_name|default:"-" }}</td>
+                                    <td><span class="badge 
+                                        {% if user.role == 'CANDIDATE' %}bg-success
+                                        {% elif user.role == 'RECRUITER' %}bg-info
+                                        {% elif user.role == 'ADMIN' %}bg-warning
+                                        {% endif %}
+                                    ">{{ user.get_role_display }}</span></td>
+                                    <td>{{ user.date_joined|date:"d M, Y" }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="/admin/users/customuser/{{ user.id }}/change/" class="btn btn-outline-primary">
+                                                <i data-feather="edit" style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                            {% if user != request.user %}
+                                                <form method="POST" action="{% url 'toggle_user_active' user.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-{% if user.is_active %}warning{% else %}success{% endif %}" 
+                                                        title="{% if user.is_active %}Desativar{% else %}Ativar{% endif %} Usuário">
+                                                        <i data-feather="{% if user.is_active %}user-x{% else %}user-check{% endif %}" style="width: 16px; height: 16px;"></i>
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <button type="button" class="btn btn-outline-secondary" disabled title="Você não pode desativar sua própria conta">
+                                                    <i data-feather="user-x" style="width: 16px; height: 16px;"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mensagem de Nenhum Resultado -->
+                    <div id="noResults" class="alert alert-info text-center" style="display: none;">
+                        <i data-feather="info" class="me-2"></i> Nenhum usuário corresponde aos critérios de pesquisa.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userSearch = document.getElementById('userSearch');
+        const roleFilter = document.getElementById('roleFilter');
+        const searchButton = document.getElementById('searchButton');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const noResults = document.getElementById('noResults');
+        
+        // Função para filtrar a tabela
+        function filterTable() {
+            const searchTerm = userSearch.value.toLowerCase();
+            const roleValue = roleFilter.value;
+            let visibleRows = 0;
+            
+            // Loop através de todas as linhas da tabela
+            const rows = usersTableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const username = row.cells[0].textContent.toLowerCase();
+                const email = row.cells[1].textContent.toLowerCase();
+                const fullName = row.cells[2].textContent.toLowerCase();
+                const role = row.dataset.role;
+                
+                // Verificar se a linha corresponde à pesquisa e ao filtro
+                const matchesSearch = username.includes(searchTerm) || 
+                                      email.includes(searchTerm) || 
+                                      fullName.includes(searchTerm);
+                const matchesRole = !roleValue || role === roleValue;
+                
+                if (matchesSearch && matchesRole) {
+                    row.style.display = '';
+                    visibleRows++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Mostrar/ocultar mensagem de "nenhum resultado"
+            noResults.style.display = visibleRows === 0 ? 'block' : 'none';
+        }
+        
+        // Adicionar ouvintes de eventos
+        searchButton.addEventListener('click', filterTable);
+        userSearch.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                filterTable();
+            }
+        });
+        roleFilter.addEventListener('change', filterTable);
+    });
+</script>
+{% endblock %}
+{% endblock %}

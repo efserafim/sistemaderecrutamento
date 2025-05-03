@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Feedback - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-3">Adicionar Feedback da Entrevista</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Feedback para {{ interview.get_interview_type_display }}</h4>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Informações da Entrevista -->
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i data-feather="info" class="me-2"></i>
+                            </div>
+                            <div>
+                                <strong>Detalhes da Entrevista:</strong>
+                                <p class="mb-1">
+                                    {{ interview.application.candidate.get_full_name|default:interview.application.candidate.username }} 
+                                    para {{ interview.application.job.title }} na {{ interview.application.job.company }}
+                                </p>
+                                <p class="mb-0">
+                                    <small>{{ interview.date_time|date:"d de F, Y - h:i A" }} ({{ interview.duration_minutes }} minutos)</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status da Entrevista</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="COMPLETED" {% if interview.status == 'COMPLETED' %}selected{% endif %}>Concluída</option>
+                                <option value="CANCELED" {% if interview.status == 'CANCELED' %}selected{% endif %}>Cancelada</option>
+                                <option value="RESCHEDULED" {% if interview.status == 'RESCHEDULED' %}selected{% endif %}>Reagendada</option>
+                            </select>
+                            <div class="form-text">Atualize o status desta entrevista</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label">Feedback</label>
+                            <textarea id="feedback" name="feedback" class="form-control" rows="8">{{ interview.feedback|default:'' }}</textarea>
+                            <div class="form-text">
+                                Forneça um feedback detalhado sobre o desempenho do candidato durante a entrevista. 
+                                Considere habilidades, experiência, adequação cultural e impressão geral.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'interview_detail' interview.id %}" class="btn btn-outline-secondary">
+                                <i data-feather="x" class="me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save" class="me-1"></i> Salvar Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

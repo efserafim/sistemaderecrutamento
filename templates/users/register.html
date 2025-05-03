@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastro - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Criar uma Conta</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Exibição de Erros -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Erro:</strong> Por favor, corrija os erros abaixo.
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Nome de Usuário *</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">Senha *</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                            {% else %}
+                                <div class="form-text small">
+                                    Sua senha deve ter pelo menos 8 caracteres e não pode ser muito similar às suas outras informações pessoais.
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmar Senha *</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger small mt-1">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Conta *</label>
+                        <div class="d-flex gap-4">
+                            {% for radio in form.role %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.role.errors %}
+                            <div class="text-danger small mt-1">{{ form.role.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary">Cadastrar</button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p>Já possui uma conta? <a href="{% url 'login' %}">Entre aqui</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Aplicar estilos aos campos do formulário -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Adicionar classes Bootstrap aos inputs do formulário
+        document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(function(input) {
+            input.classList.add('form-control');
+        });
+        
+        // Adicionar classes Bootstrap aos campos select do formulário
+        document.querySelectorAll('select').forEach(function(select) {
+            select.classList.add('form-select');
+        });
+        
+        // Adicionar classes Bootstrap aos botões de rádio
+        document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+            radio.classList.add('form-check-input');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}
+        Editar Vaga: {{ object.title }} - Sistema de Recrutamento
+    {% else %}
+        Publicar Nova Vaga - Sistema de Recrutamento
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-3">
+                {% if object %}
+                    Editar Vaga: {{ object.title }}
+                {% else %}
+                    Publicar Nova Vaga
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        {% if object %}
+                            Editar Detalhes da Vaga
+                        {% else %}
+                            Detalhes da Vaga
+                        {% endif %}
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Erro:</strong> Por favor, corrija os erros abaixo.
+                                <ul>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Informações Básicas -->
+                        <h5 class="border-bottom pb-2 mb-3">Informações Básicas</h5>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Título da Vaga *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ form.company.id_for_label }}" class="form-label">Empresa *</label>
+                                {{ form.company }}
+                                {% if form.company.errors %}
+                                    <div class="text-danger small mt-1">{{ form.company.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.location.id_for_label }}" class="form-label">Localização *</label>
+                                {{ form.location }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger small mt-1">{{ form.location.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ form.job_type.id_for_label }}" class="form-label">Tipo de Vaga *</label>
+                                {{ form.job_type }}
+                                {% if form.job_type.errors %}
+                                    <div class="text-danger small mt-1">{{ form.job_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.salary_range.id_for_label }}" class="form-label">Faixa Salarial</label>
+                                {{ form.salary_range }}
+                                {% if form.salary_range.errors %}
+                                    <div class="text-danger small mt-1">{{ form.salary_range.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Detalhes da Vaga -->
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">Detalhes da Vaga</h5>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Descrição da Vaga *</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Forneça uma descrição detalhada das responsabilidades do cargo.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.requirements.id_for_label }}" class="form-label">Requisitos *</label>
+                            {{ form.requirements }}
+                            {% if form.requirements.errors %}
+                                <div class="text-danger small mt-1">{{ form.requirements.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Liste as habilidades, qualificações e experiência necessárias para esta posição.</div>
+                        </div>
+                        
+                        <!-- Configurações -->
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">Configurações</h5>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.deadline.id_for_label }}" class="form-label">Prazo para Candidatura *</label>
+                            {{ form.deadline }}
+                            {% if form.deadline.errors %}
+                                <div class="text-danger small mt-1">{{ form.deadline.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                Vaga Ativa
+                            </label>
+                            <div class="form-text">Se desmarcada, a vaga não será visível para candidatos.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if object %}{% url 'job_detail' object.id %}{% else %}{% url 'my_posted_jobs' %}{% endif %}" class="btn btn-outline-secondary">
+                                <i data-feather="x" class="me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save" class="me-1"></i> {% if object %}Atualizar{% else %}Publicar{% endif %} Vaga
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Aplicar estilos aos campos do formulário -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Adicionar classes Bootstrap aos inputs do formulário
+        document.querySelectorAll('input[type="text"], input[type="email"], input[type="datetime-local"]').forEach(function(input) {
+            input.classList.add('form-control');
+        });
+        
+        // Adicionar classes Bootstrap aos textareas do formulário
+        document.querySelectorAll('textarea').forEach(function(textarea) {
+            textarea.classList.add('form-control');
+        });
+        
+        // Adicionar classes Bootstrap aos campos select do formulário
+        document.querySelectorAll('select').forEach(function(select) {
+            select.classList.add('form-select');
+        });
+        
+        // Adicionar classes Bootstrap aos checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+            checkbox.classList.add('form-check-input');
+        });
+    });
+</script>
+{% endblock %}

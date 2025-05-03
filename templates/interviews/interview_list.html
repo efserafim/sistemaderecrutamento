@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-3">{{ title }}</h1>
+        </div>
+    </div>
+    
+    {% if not interviews and not past_interviews %}
+        <div class="alert alert-info">
+            <p class="mb-0">Você ainda não tem entrevistas agendadas.</p>
+        </div>
+    {% endif %}
+    
+    {% if interviews %}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Próximas Entrevistas</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data & Hora</th>
+                                {% if user.is_candidate %}
+                                    <th>Vaga</th>
+                                    <th>Empresa</th>
+                                {% else %}
+                                    <th>Candidato</th>
+                                    <th>Vaga</th>
+                                {% endif %}
+                                <th>Tipo</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interview in interviews %}
+                                <tr>
+                                    <td>
+                                        {{ interview.date_time|date:"d de M, Y - h:i A" }}
+                                        <div class="small text-muted">{{ interview.duration_minutes }} minutos</div>
+                                    </td>
+                                    
+                                    {% if user.is_candidate %}
+                                        <td>{{ interview.application.job.title }}</td>
+                                        <td>{{ interview.application.job.company }}</td>
+                                    {% else %}
+                                        <td>{{ interview.application.candidate.get_full_name|default:interview.application.candidate.username }}</td>
+                                        <td>{{ interview.application.job.title }}</td>
+                                    {% endif %}
+                                    
+                                    <td>{{ interview.get_interview_type_display }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if interview.status == 'SCHEDULED' %}bg-primary
+                                            {% elif interview.status == 'COMPLETED' %}bg-success
+                                            {% elif interview.status == 'CANCELED' %}bg-danger
+                                            {% elif interview.status == 'RESCHEDULED' %}bg-warning
+                                            {% endif %}">
+                                            {{ interview.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'interview_detail' interview.id %}" class="btn btn-outline-primary">
+                                                <i data-feather="eye" style="width: 16px; height: 16px;"></i>
+                                                Ver
+                                            </a>
+                                            
+                                            {% if user.is_recruiter %}
+                                                <a href="{% url 'interview_update' interview.id %}" class="btn btn-outline-secondary">
+                                                    <i data-feather="edit-2" style="width: 16px; height: 16px;"></i>
+                                                    Editar
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if past_interviews %}
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h4 class="mb-0">Entrevistas Passadas</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data & Hora</th>
+                                {% if user.is_candidate %}
+                                    <th>Vaga</th>
+                                    <th>Empresa</th>
+                                {% else %}
+                                    <th>Candidato</th>
+                                    <th>Vaga</th>
+                                {% endif %}
+                                <th>Tipo</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interview in past_interviews %}
+                                <tr class="{% if interview.status == 'CANCELED' %}table-secondary{% endif %}">
+                                    <td>
+                                        {{ interview.date_time|date:"d de M, Y - h:i A" }}
+                                        <div class="small text-muted">{{ interview.duration_minutes }} minutos</div>
+                                    </td>
+                                    
+                                    {% if user.is_candidate %}
+                                        <td>{{ interview.application.job.title }}</td>
+                                        <td>{{ interview.application.job.company }}</td>
+                                    {% else %}
+                                        <td>{{ interview.application.candidate.get_full_name|default:interview.application.candidate.username }}</td>
+                                        <td>{{ interview.application.job.title }}</td>
+                                    {% endif %}
+                                    
+                                    <td>{{ interview.get_interview_type_display }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if interview.status == 'SCHEDULED' %}bg-primary
+                                            {% elif interview.status == 'COMPLETED' %}bg-success
+                                            {% elif interview.status == 'CANCELED' %}bg-danger
+                                            {% elif interview.status == 'RESCHEDULED' %}bg-warning
+                                            {% endif %}">
+                                            {{ interview.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'interview_detail' interview.id %}" class="btn btn-outline-primary">
+                                                <i data-feather="eye" style="width: 16px; height: 16px;"></i>
+                                                Ver
+                                            </a>
+                                            
+                                            {% if user.is_recruiter and interview.status != 'COMPLETED' and interview.status != 'CANCELED' %}
+                                                <a href="{% url 'add_feedback' interview.id %}" class="btn btn-outline-info">
+                                                    <i data-feather="message-circle" style="width: 16px; height: 16px;"></i>
+                                                    Feedback
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

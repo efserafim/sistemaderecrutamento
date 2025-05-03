@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Início - Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <div class="mb-4">
+        <i data-feather="briefcase" width="72" height="72"></i>
+    </div>
+    <h1 class="display-5 fw-bold">Sistema de Recrutamento e Seleção</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+            Uma plataforma que conecta candidatos com empregadores.
+            Encontre seu emprego dos sonhos ou o candidato perfeito para sua empresa.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            {% if user.is_authenticated %}
+                {% if user.is_candidate %}
+                    <a href="{% url 'job_list' %}" class="btn btn-primary btn-lg px-4 gap-3">Procurar Vagas</a>
+                    <a href="{% url 'my_applications' %}" class="btn btn-outline-secondary btn-lg px-4">Minhas Candidaturas</a>
+                {% elif user.is_recruiter %}
+                    <a href="{% url 'job_create' %}" class="btn btn-primary btn-lg px-4 gap-3">Publicar Vaga</a>
+                    <a href="{% url 'my_posted_jobs' %}" class="btn btn-outline-secondary btn-lg px-4">Minhas Vagas Publicadas</a>
+                {% elif user.is_admin %}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-lg px-4 gap-3">Painel Administrativo</a>
+                    <a href="{% url 'user_management' %}" class="btn btn-outline-secondary btn-lg px-4">Gerenciar Usuários</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4 gap-3">Entrar</a>
+                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-lg px-4">Cadastrar</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">Funcionalidades</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i data-feather="search"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Encontrar Vagas</h3>
+                <p>Procure vagas que combinem com suas habilidades e experiência. Candidate-se com apenas alguns cliques.</p>
+                <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
+                    Procurar Vagas
+                </a>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i data-feather="file-text"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Publicar Vagas</h3>
+                <p>Crie anúncios de emprego e alcance candidatos qualificados. Analise candidaturas e agende entrevistas.</p>
+                {% if user.is_authenticated and user.is_recruiter %}
+                    <a href="{% url 'job_create' %}" class="btn btn-outline-primary">
+                        Publicar Vaga
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary">
+                        Cadastrar como Recrutador
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i data-feather="calendar"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Agendar Entrevistas</h3>
+                <p>Gerencie o processo de entrevistas com eficiência. Agende e acompanhe entrevistas com candidatos.</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'my_interviews' %}" class="btn btn-outline-primary">
+                        Ver Entrevistas
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary">
+                        Criar Conta
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} - {{ job.company }} | Sistema de Recrutamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'job_list' %}">Vagas</a></li>
+                    <li class="breadcrumb-item active">{{ job.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{{ job.title }}</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Detalhes da Vaga -->
+                    <div class="mb-4">
+                        <h5 class="card-title">Empresa: {{ job.company }}</h5>
+                        <p class="card-text"><i data-feather="map-pin" class="feather-small me-1"></i> {{ job.location }}</p>
+                        
+                        <div class="d-flex flex-wrap mb-3">
+                            <span class="badge bg-primary me-2 mb-1">{{ job.get_job_type_display }}</span>
+                            {% if job.salary_range %}
+                                <span class="badge bg-success me-2 mb-1">{{ job.salary_range }}</span>
+                            {% endif %}
+                            {% if job.is_active %}
+                                <span class="badge bg-success me-2 mb-1">Ativa</span>
+                            {% else %}
+                                <span class="badge bg-danger me-2 mb-1">Inativa</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="small text-muted mb-3">
+                            <div><i data-feather="calendar" class="feather-small me-1"></i> Publicada: {{ job.created_at|date:"d de F, Y" }}</div>
+                            <div><i data-feather="clock" class="feather-small me-1"></i> Prazo para Candidatura: {{ job.deadline|date:"d de F, Y" }}</div>
+                            <div><i data-feather="user" class="feather-small me-1"></i> Publicada por: {{ job.recruiter.get_full_name|default:job.recruiter.username }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Descrição -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Descrição da Vaga</h5>
+                        <div class="job-description">
+                            {{ job.description|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <!-- Requisitos -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Requisitos</h5>
+                        <div class="job-requirements">
+                            {{ job.requirements|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ações da Vaga -->
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if user.is_authenticated and user.is_recruiter and is_owner %}
+                                <a href="{% url 'job_update' job.id %}" class="btn btn-outline-primary me-2">
+                                    <i data-feather="edit-2" class="me-1"></i> Editar Vaga
+                                </a>
+                                <a href="{% url 'view_applications' job.id %}" class="btn btn-outline-info">
+                                    <i data-feather="users" class="me-1"></i> Ver Candidaturas 
+                                    {% if application_count %}<span class="badge bg-secondary">{{ application_count }}</span>{% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <a href="{% url 'job_list' %}" class="btn btn-outline-secondary">
+                                <i data-feather="arrow-left" class="me-1"></i> Voltar para Vagas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Cartão para Candidatar-se à Vaga -->
+            {% if user.is_authenticated and user.is_candidate and job.is_active %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Candidatar-se a Esta Vaga</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if already_applied %}
+                            <div class="alert alert-info mb-0">
+                                <i data-feather="check-circle" class="me-2"></i> Você já se candidatou a esta vaga.
+                                <p class="mb-0 mt-2">
+                                    <a href="{% url 'my_applications' %}" class="btn btn-sm btn-primary">Ver Minhas Candidaturas</a>
+                                </p>
+                            </div>
+                        {% else %}
+                            <form method="POST" action="{% url 'apply_for_job' job.id %}">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label for="{{ application_form.cover_letter.id_for_label }}" class="form-label">Carta de Apresentação</label>
+                                    {{ application_form.cover_letter }}
+                                    <div class="form-text">Explique por que você é um bom candidato para esta posição.</div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Enviar Candidatura</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elif not user.is_authenticated %}
+                <!-- Chamada para ação para usuários não autenticados -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Interessado Nesta Vaga?</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Você precisa fazer login ou criar uma conta para se candidatar a esta vaga.</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Login</a>
+                            <a href="{% url 'register' %}" class="btn btn-outline-primary">Criar Conta</a>
+                        </div>
+                    </div>
+                </div>
+            {% elif user.is_candidate and not job.is_active %}
+                <!-- Aviso para vagas inativas -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Vaga Indisponível</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Esta vaga não está mais aceitando candidaturas.</p>
+                        <a href="{% url 'job_list' %}" class="btn btn-outline-primary">Ver Outras Vagas</a>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Informação da Vaga -->
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Informações da Vaga</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Tipo de Emprego:</strong>
+                        <p>{{ job.get_job_type_display }}</p>
+                    </div>
+                    
+                    {% if job.salary_range %}
+                    <div class="mb-3">
+                        <strong>Faixa Salarial:</strong>
+                        <p>{{ job.salary_range }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <strong>Localização:</strong>
+                        <p>{{ job.location }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Empresa:</strong>
+                        <p>{{ job.company }}</p>
+                    </div>
+                    
+                    <div>
+                        <strong>Prazo para Candidatura:</strong>
+                        <p>{{ job.deadline|date:"d de F, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Aplicar classes Bootstrap aos inputs do formulário
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.querySelector('textarea[name="cover_letter"]')) {
+            document.querySelector('textarea[name="cover_letter"]').classList.add('form-control');
+        }
+        
+        // Ajustar tamanhos dos ícones
+        document.querySelectorAll('.feather-small').forEach(icon => {
+            icon.setAttribute('width', '16');
+            icon.setAttribute('height', '16');
+        });
+    });
+</script>
+{% endblock %}
