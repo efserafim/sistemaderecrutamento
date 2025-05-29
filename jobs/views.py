@@ -11,7 +11,7 @@ from .models import Job, Application
 from .forms import JobForm, ApplicationForm, ApplicationStatusForm
 
 class JobListView(ListView):
-    """View to list all active jobs for candidates to browse"""
+    """Visualizar para listar todos os empregos ativos para os candidatos navegarem"""
     model = Job
     template_name = 'jobs/job_list.html'
     context_object_name = 'jobs'
@@ -92,14 +92,14 @@ class JobDetailView(DetailView):
 def apply_for_job(request, job_id):
     """Handle job application submission by candidates"""
     if not request.user.is_candidate():
-        messages.error(request, "Only candidates can apply for jobs.")
+        messages.error(request, "Somente candidatos podem se candidatar a vagas.")
         return redirect('job_list')
     
     job = get_object_or_404(Job, pk=job_id, is_active=True)
     
     # Check if already applied
     if Application.objects.filter(job=job, candidate=request.user).exists():
-        messages.info(request, "You have already applied for this job.")
+        messages.info(request, "Você já se candidatou para esta vaga.")
         return redirect('job_detail', pk=job.pk)
     
     if request.method == 'POST':
@@ -109,7 +109,7 @@ def apply_for_job(request, job_id):
             application.job = job
             application.candidate = request.user
             application.save()
-            messages.success(request, "Your application has been submitted successfully!")
+            messages.success(request, "Sua inscrição foi enviada com sucesso!")
             return redirect('job_detail', pk=job.pk)
     else:
         form = ApplicationForm()
@@ -128,7 +128,7 @@ class JobCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.recruiter = self.request.user
-        messages.success(self.request, "Job posted successfully!")
+        messages.success(self.request, "Emprego postado com sucesso!")
         return super().form_valid(form)
     
     def test_func(self):
@@ -144,7 +144,7 @@ class JobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('job_detail', kwargs={'pk': self.object.pk})
     
     def form_valid(self, form):
-        messages.success(self.request, "Job updated successfully!")
+        messages.success(self.request, "Emprego atualizado com sucesso!")
         return super().form_valid(form)
     
     def test_func(self):
@@ -158,7 +158,7 @@ def toggle_job_status(request, job_id):
     
     # Check permissions
     if request.user != job.recruiter and not request.user.is_admin():
-        return HttpResponseForbidden("You don't have permission to modify this job.")
+        return HttpResponseForbidden("Você não tem permissão para modificar este trabalho.")
     
     job.is_active = not job.is_active
     job.save()
@@ -172,7 +172,7 @@ def toggle_job_status(request, job_id):
 def my_posted_jobs(request):
     """Show recruiters a list of jobs they have posted"""
     if not request.user.is_recruiter():
-        messages.error(request, "Only recruiters can view posted jobs.")
+        messages.error(request, "Somente recrutadores podem visualizar vagas publicadas.")
         return redirect('home')
     
     jobs = Job.objects.filter(recruiter=request.user).order_by('-created_at')
@@ -184,14 +184,14 @@ def my_posted_jobs(request):
     return render(request, 'jobs/job_list.html', {
         'jobs': jobs,
         'is_my_jobs': True,
-        'title': 'My Posted Jobs'
+        'title': 'Meus empregos publicados'
     })
 
 @login_required
 def my_applications(request):
     """Show candidates a list of jobs they've applied to"""
     if not request.user.is_candidate():
-        messages.error(request, "Only candidates can view applications.")
+        messages.error(request, "Somente os candidatos podem visualizar as inscrições.")
         return redirect('home')
     
     applications = Application.objects.filter(candidate=request.user).select_related('job')
@@ -208,7 +208,7 @@ def view_applications(request, job_id):
     
     # Check permissions
     if request.user != job.recruiter and not request.user.is_admin():
-        return HttpResponseForbidden("You don't have permission to view applications for this job.")
+        return HttpResponseForbidden("Você não tem permissão para visualizar candidaturas para esta vaga.")
     
     applications = Application.objects.filter(job=job).select_related('candidate')
     
@@ -235,7 +235,7 @@ def application_detail(request, application_id):
         form = ApplicationStatusForm(request.POST, instance=application)
         if form.is_valid():
             form.save()
-            messages.success(request, "Application status updated successfully!")
+            messages.success(request, "Status da aplicação atualizado com sucesso!")
             return redirect('application_detail', application_id=application.id)
     else:
         form = ApplicationStatusForm(instance=application) if (is_recruiter or is_admin) else None

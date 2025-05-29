@@ -5,16 +5,17 @@ from jobs.models import Application
 class Interview(models.Model):
     """Model for scheduling interviews with candidates"""
     class InterviewType(models.TextChoices):
-        PHONE = 'PHONE', 'Phone Interview'
-        VIDEO = 'VIDEO', 'Video Call'
-        IN_PERSON = 'IN_PERSON', 'In-Person Interview'
-        TECHNICAL = 'TECHNICAL', 'Technical Assessment'
+        PHONE = 'PHONE', 'Entrevista por Telefone'
+        VIDEO = 'VIDEO', 'Chamada de Vídeo'
+        IN_PERSON = 'IN_PERSON', 'Entrevista Presencial'
+        TECHNICAL = 'TECHNICAL', 'Avaliação Técnica'
+
     
     class InterviewStatus(models.TextChoices):
-        SCHEDULED = 'SCHEDULED', 'Scheduled'
-        COMPLETED = 'COMPLETED', 'Completed'
-        CANCELED = 'CANCELED', 'Canceled'
-        RESCHEDULED = 'RESCHEDULED', 'Rescheduled'
+        SCHEDULED = 'SCHEDULED', 'Agendado'
+        COMPLETED = 'COMPLETED', 'Concluído'
+        CANCELED = 'CANCELED', 'Cancelado'
+        RESCHEDULED = 'RESCHEDULED', 'Remarcado'
     
     application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='interviews')
     interview_type = models.CharField(max_length=20, choices=InterviewType.choices)

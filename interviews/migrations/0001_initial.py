@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
             name='Interview',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('interview_type', models.CharField(choices=[('PHONE', 'Phone Interview'), ('VIDEO', 'Video Call'), ('IN_PERSON', 'In-Person Interview'), ('TECHNICAL', 'Technical Assessment')], max_length=20)),
+                ('interview_type', models.CharField(choices=[('PHONE', 'Entrevista por telefone'), ('VIDEO', 'Videochamada'), ('IN_PERSON', 'Entrevista pessoal'), ('TECHNICAL', 'Avaliação Técnica')], max_length=20)),
                 ('date_time', models.DateTimeField()),
                 ('duration_minutes', models.PositiveIntegerField(default=30)),
                 ('location', models.CharField(blank=True, help_text='Physical location or meeting link', max_length=255, null=True)),
-                ('status', models.CharField(choices=[('SCHEDULED', 'Scheduled'), ('COMPLETED', 'Completed'), ('CANCELED', 'Canceled'), ('RESCHEDULED', 'Rescheduled')], default='SCHEDULED', max_length=20)),
+                ('status', models.CharField(choices=[('SCHEDULED', 'Agendado'), ('COMPLETED', 'Concluído'), ('CANCELED', 'Cancelado'), ('RESCHEDULED', 'Remarcado')], default='SCHEDULED', max_length=20)),
                 ('notes', models.TextField(blank=True, null=True)),
                 ('feedback', models.TextField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

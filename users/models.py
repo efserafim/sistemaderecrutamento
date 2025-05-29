@@ -8,9 +8,9 @@ class CustomUser(AbstractUser):
     Roles can be 'candidate', 'recruiter', or 'admin'.
     """
     class Role(models.TextChoices):
-        CANDIDATE = 'CANDIDATE', _('Candidate')
-        RECRUITER = 'RECRUITER', _('Recruiter')
-        ADMIN = 'ADMIN', _('Administrator')
+        CANDIDATE = 'CANDIDATE', _('Candidato')
+        RECRUITER = 'RECRUITER', _('Recrutador')
+        ADMIN = 'ADMIN', _('Administrador')
     
     role = models.CharField(
         max_length=20,
@@ -37,10 +37,10 @@ class CustomUser(AbstractUser):
 class CandidateProfile(models.Model):
     """Additional information related to candidates"""
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='candidate_profile')
-    resume = models.TextField(blank=True, null=True, help_text=_('Candidate resume text'))
-    skills = models.TextField(blank=True, null=True, help_text=_('Candidate skills (comma separated)'))
-    experience = models.IntegerField(default=0, help_text=_('Years of experience'))
-    education = models.TextField(blank=True, null=True, help_text=_('Education history'))
+    resume = models.TextField(blank=True, null=True, help_text=_('Texto do currículo do candidato'))
+    skills = models.TextField(blank=True, null=True, help_text=_('Habilidades do candidato (separadas por vírgula)'))
+    experience = models.IntegerField(default=0, help_text=_('Anos de experiência'))
+    education = models.TextField(blank=True, null=True, help_text=_('Estudos'))
 
     def __str__(self):
         return f"Profile for {self.user.username}"

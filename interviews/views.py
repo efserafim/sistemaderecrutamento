@@ -20,7 +20,7 @@ def schedule_interview(request, application_id):
     
     # Check permissions
     if request.user != application.job.recruiter and not request.user.is_admin():
-        return HttpResponseForbidden("You don't have permission to schedule interviews for this application.")
+        return HttpResponseForbidden("Você não tem permissão para agendar entrevistas para esta aplicação.")
     
     if request.method == 'POST':
         form = InterviewForm(request.POST)
@@ -34,7 +34,7 @@ def schedule_interview(request, application_id):
                 application.status = Application.Status.REVIEWING
                 application.save()
             
-            messages.success(request, "Interview scheduled successfully!")
+            messages.success(request, "Entrevista agendada com sucesso!")
             return redirect('application_detail', application_id=application.id)
     else:
         # Pre-fill with sensible defaults
@@ -46,7 +46,7 @@ def schedule_interview(request, application_id):
     return render(request, 'interviews/interview_form.html', {
         'form': form,
         'application': application,
-        'title': f'Schedule Interview with {application.candidate.get_full_name() or application.candidate.username}'
+        'title': f'Programar Entrevista com o  {application.candidate.get_full_name() or application.candidate.username}'
     })
 
 @login_required
@@ -139,7 +139,7 @@ def my_interviews(request):
             date_time__gte=now
         ).select_related('application__job', 'application__candidate')
         
-        title = 'My Upcoming Interviews'
+        title = 'Minhas próximas entrevistas'
         
     elif request.user.is_recruiter():
         # For recruiters, show interviews they scheduled
@@ -148,7 +148,7 @@ def my_interviews(request):
             date_time__gte=now
         ).select_related('application__job', 'application__candidate')
         
-        title = 'Upcoming Interviews I Scheduled'
+        title = 'Próximas entrevistas que agendei'
         
     else:
         # For admins, show all upcoming interviews
@@ -156,7 +156,7 @@ def my_interviews(request):
             date_time__gte=now
         ).select_related('application__job', 'application__candidate')
         
-        title = 'All Upcoming Interviews'
+        title = 'Todas as próximas entrevistas'
     
     # Get past interviews too
     past_interviews = Interview.objects.filter(
@@ -188,11 +188,11 @@ def add_feedback(request, interview_id):
     
     # Check permissions
     if request.user != interview.recruiter and not request.user.is_admin():
-        return HttpResponseForbidden("You don't have permission to add feedback for this interview.")
+        return HttpResponseForbidden("Você não tem permissão para adicionar feedback para esta entrevista.")
     
     # Can only add feedback to past interviews
     if not interview.is_past:
-        messages.error(request, "You can only add feedback for interviews that have already occurred.")
+        messages.error(request, "Você só pode adicionar feedback para entrevistas que já ocorreram.")
         return redirect('interview_detail', interview_id=interview.id)
     
     if request.method == 'POST':
@@ -214,7 +214,7 @@ def add_feedback(request, interview_id):
                 application.status = Application.Status.SHORTLISTED
                 application.save()
         
-        messages.success(request, "Feedback added successfully!")
+        messages.success(request, "Feedback adicionado com sucesso!")
         return redirect('interview_detail', interview_id=interview.id)
     
     return render(request, 'interviews/add_feedback.html', {

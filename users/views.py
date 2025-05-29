@@ -31,7 +31,7 @@ def register(request):
                 
                 # Log the user in
                 login(request, user)
-                messages.success(request, 'Account created successfully! Complete your profile.')
+                messages.success(request, 'Conta criada com sucesso! Complete seu perfil.')
                 return redirect('profile')
     else:
         form = UserRegisterForm()
@@ -59,7 +59,7 @@ def profile(request):
             user_form.save()
             if profile_form:
                 profile_form.save()
-            messages.success(request, 'Your profile has been updated!')
+            messages.success(request, 'Seu perfil foi atualizado!')
             return redirect('profile')
     else:
         user_form = UserUpdateForm(instance=user)
@@ -92,7 +92,7 @@ class UserManagementView(UserPassesTestMixin, ListView):
 def admin_dashboard(request):
     """Dashboard for admin users with system statistics"""
     if not request.user.is_admin():
-        messages.error(request, "You don't have permission to view this page")
+        messages.error(request, "Você não tem permissão para visualizar esta página")
         return redirect('home')
     
     # Count users by role
@@ -113,19 +113,19 @@ def admin_dashboard(request):
 def toggle_user_active(request, user_id):
     """Toggle a user's active status (for admin use)"""
     if not request.user.is_admin():
-        messages.error(request, "You don't have permission to perform this action")
+        messages.error(request, "Você não tem permissão para executar esta ação")
         return redirect('home')
     
     user = get_object_or_404(CustomUser, id=user_id)
     
     # Don't allow deactivating yourself
     if user == request.user:
-        messages.error(request, "You cannot deactivate your own account")
+        messages.error(request, "Você não pode desativar sua própria conta")
         return redirect('user_management')
     
     user.is_active = not user.is_active
     user.save()
     
-    status = "activated" if user.is_active else "deactivated"
+    status = "ativado" if user.is_active else "desativado"
     messages.success(request, f"User {user.username} has been {status}")
     return redirect('user_management')

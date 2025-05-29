@@ -11,10 +11,10 @@ class Job(models.Model):
     requirements = models.TextField()
     salary_range = models.CharField(max_length=100, blank=True, null=True)
     job_type = models.CharField(max_length=50, choices=[
-        ('FULL_TIME', 'Full Time'),
-        ('PART_TIME', 'Part Time'),
-        ('CONTRACT', 'Contract'),
-        ('INTERNSHIP', 'Internship'),
+        ('FULL_TIME', 'Integral'),
+        ('PART_TIME', 'Parcial'),
+        ('CONTRACT', 'Contrato'),
+        ('INTERNSHIP', 'Estágio'),
     ])
     
     recruiter = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='posted_jobs')
@@ -33,11 +33,12 @@ class Job(models.Model):
 class Application(models.Model):
     """Model for job applications"""
     class Status(models.TextChoices):
-        APPLIED = 'APPLIED', 'Applied'
-        REVIEWING = 'REVIEWING', 'Under Review'
-        SHORTLISTED = 'SHORTLISTED', 'Shortlisted'
-        REJECTED = 'REJECTED', 'Rejected'
-        HIRED = 'HIRED', 'Hired'
+        APPLIED = 'APPLIED', 'Candidatado'
+        REVIEWING = 'REVIEWING', 'Em análise'
+        SHORTLISTED = 'SHORTLISTED', 'Pré-selecionado'
+        REJECTED = 'REJECTED', 'Rejeitado'
+        HIRED = 'HIRED', 'Contratado'
+
     
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='applications')

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('cover_letter', models.TextField()),
-                ('status', models.CharField(choices=[('APPLIED', 'Applied'), ('REVIEWING', 'Under Review'), ('SHORTLISTED', 'Shortlisted'), ('REJECTED', 'Rejected'), ('HIRED', 'Hired')], default='APPLIED', max_length=20)),
+                ('status', models.CharField(choices=[('APPLIED', 'Candidatado'), ('REVIEWING', 'Em análise'), ('SHORTLISTED', 'Pré-selecionado'), ('REJECTED', 'Rejeitado'), ('HIRED', 'Contratado')], default='APPLIED', max_length=20)),
                 ('applied_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('recruiter_notes', models.TextField(blank=True, null=True)),
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('requirements', models.TextField()),
                 ('salary_range', models.CharField(blank=True, max_length=100, null=True)),
-                ('job_type', models.CharField(choices=[('FULL_TIME', 'Full Time'), ('PART_TIME', 'Part Time'), ('CONTRACT', 'Contract'), ('INTERNSHIP', 'Internship')], max_length=50)),
+                ('job_type', models.CharField(choices=[('FULL_TIME', 'Integral'), ('PART_TIME', 'Parcial'), ('CONTRACT', 'Contrato'), ('INTERNSHIP', 'Estágio')], max_length=50)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('deadline', models.DateTimeField(default=django.utils.timezone.now)),
