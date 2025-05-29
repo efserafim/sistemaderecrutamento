@@ -21,15 +21,15 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
-                # Create user
+              
                 user = form.save()
-                # Create profile based on role
+             
                 if user.is_candidate():
                     CandidateProfile.objects.create(user=user)
                 elif user.is_recruiter():
                     RecruiterProfile.objects.create(user=user)
                 
-                # Log the user in
+             
                 login(request, user)
                 messages.success(request, 'Conta criada com sucesso! Complete seu perfil.')
                 return redirect('profile')
@@ -46,7 +46,7 @@ def profile(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=user)
         
-        # Get appropriate profile form based on role
+       
         if user.is_candidate():
             profile, created = CandidateProfile.objects.get_or_create(user=user)
             profile_form = CandidateProfileForm(request.POST, instance=profile)
@@ -54,7 +54,7 @@ def profile(request):
             profile, created = RecruiterProfile.objects.get_or_create(user=user)
             profile_form = RecruiterProfileForm(request.POST, instance=profile)
         
-        # Save both forms if valid
+       
         if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
             user_form.save()
             if profile_form:
@@ -64,7 +64,6 @@ def profile(request):
     else:
         user_form = UserUpdateForm(instance=user)
         
-        # Prepare profile form based on role
         if user.is_candidate():
             profile, created = CandidateProfile.objects.get_or_create(user=user)
             profile_form = CandidateProfileForm(instance=profile)
@@ -95,7 +94,7 @@ def admin_dashboard(request):
         messages.error(request, "Você não tem permissão para visualizar esta página")
         return redirect('home')
     
-    # Count users by role
+    
     total_users = CustomUser.objects.count()
     candidate_count = CustomUser.objects.filter(role=CustomUser.Role.CANDIDATE).count()
     recruiter_count = CustomUser.objects.filter(role=CustomUser.Role.RECRUITER).count()
@@ -118,7 +117,7 @@ def toggle_user_active(request, user_id):
     
     user = get_object_or_404(CustomUser, id=user_id)
     
-    # Don't allow deactivating yourself
+   
     if user == request.user:
         messages.error(request, "Você não pode desativar sua própria conta")
         return redirect('user_management')

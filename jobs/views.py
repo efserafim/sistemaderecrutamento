@@ -20,7 +20,7 @@ class JobListView(ListView):
     def get_queryset(self):
         queryset = Job.objects.filter(is_active=True)
         
-        # Handle search
+   
         search_query = self.request.GET.get('search', '')
         if search_query:
             queryset = queryset.filter(
@@ -31,7 +31,7 @@ class JobListView(ListView):
                 Q(requirements__icontains=search_query)
             )
         
-        # Handle filters
+        
         job_type = self.request.GET.get('job_type', '')
         if job_type:
             queryset = queryset.filter(job_type=job_type)
@@ -48,10 +48,10 @@ class JobListView(ListView):
         context['job_type_filter'] = self.request.GET.get('job_type', '')
         context['location_filter'] = self.request.GET.get('location', '')
         
-        # Add distinct locations for filter dropdown
+        
         context['locations'] = Job.objects.filter(is_active=True).values_list('location', flat=True).distinct()
         
-        # If user is authenticated and is a candidate, check which jobs they've applied to
+       
         if self.request.user.is_authenticated and self.request.user.is_candidate():
             applied_jobs = set(Application.objects.filter(
                 candidate=self.request.user
@@ -70,7 +70,7 @@ class JobDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        # Check if user can apply for this job
+      
         if user.is_authenticated and user.is_candidate():
             already_applied = Application.objects.filter(
                 job=self.object, 
@@ -81,7 +81,7 @@ class JobDetailView(DetailView):
             if not already_applied:
                 context['application_form'] = ApplicationForm()
                 
-        # For recruiters, show application statistics
+       
         if user.is_authenticated and (user.is_recruiter() or user.is_admin()):
             context['is_owner'] = self.object.recruiter == user
             context['application_count'] = Application.objects.filter(job=self.object).count()
@@ -97,7 +97,7 @@ def apply_for_job(request, job_id):
     
     job = get_object_or_404(Job, pk=job_id, is_active=True)
     
-    # Check if already applied
+    
     if Application.objects.filter(job=job, candidate=request.user).exists():
         messages.info(request, "Você já se candidatou para esta vaga.")
         return redirect('job_detail', pk=job.pk)
@@ -156,7 +156,7 @@ def toggle_job_status(request, job_id):
     """Allow recruiters to toggle a job's active status"""
     job = get_object_or_404(Job, pk=job_id)
     
-    # Check permissions
+
     if request.user != job.recruiter and not request.user.is_admin():
         return HttpResponseForbidden("Você não tem permissão para modificar este trabalho.")
     
@@ -177,7 +177,7 @@ def my_posted_jobs(request):
     
     jobs = Job.objects.filter(recruiter=request.user).order_by('-created_at')
     
-    # Count applications for each job
+  
     for job in jobs:
         job.application_count = job.applications.count()
     
@@ -206,7 +206,7 @@ def view_applications(request, job_id):
     """Let recruiters view applications for a specific job"""
     job = get_object_or_404(Job, pk=job_id)
     
-    # Check permissions
+  
     if request.user != job.recruiter and not request.user.is_admin():
         return HttpResponseForbidden("Você não tem permissão para visualizar candidaturas para esta vaga.")
     
@@ -223,7 +223,7 @@ def application_detail(request, application_id):
     """Show detailed view of an application with option to update status"""
     application = get_object_or_404(Application, pk=application_id)
     
-    # Check permissions
+
     is_recruiter = request.user == application.job.recruiter
     is_candidate = request.user == application.candidate
     is_admin = request.user.is_admin()

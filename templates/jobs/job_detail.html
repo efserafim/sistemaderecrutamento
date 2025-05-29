@@ -22,7 +22,7 @@
                     <h2 class="mb-0">{{ job.title }}</h2>
                 </div>
                 <div class="card-body">
-                    <!-- Detalhes da Vaga -->
+                    
                     <div class="mb-4">
                         <h5 class="card-title">Empresa: {{ job.company }}</h5>
                         <p class="card-text"><i data-feather="map-pin" class="feather-small me-1"></i> {{ job.location }}</p>
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     
-                    <!-- Descrição -->
+         
                     <div class="mb-4">
                         <h5 class="border-bottom pb-2">Descrição da Vaga</h5>
                         <div class="job-description">
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                     
-                    <!-- Requisitos -->
+
                     <div class="mb-4">
                         <h5 class="border-bottom pb-2">Requisitos</h5>
                         <div class="job-requirements">
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 
-                <!-- Ações da Vaga -->
+ 
                 <div class="card-footer">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -89,7 +89,7 @@
         </div>
         
         <div class="col-md-4">
-            <!-- Cartão para Candidatar-se à Vaga -->
+ 
             {% if user.is_authenticated and user.is_candidate and job.is_active %}
                 <div class="card shadow mb-4">
                     <div class="card-header bg-primary text-white">
@@ -121,7 +121,7 @@
                     </div>
                 </div>
             {% elif not user.is_authenticated %}
-                <!-- Chamada para ação para usuários não autenticados -->
+               
                 <div class="card shadow mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Interessado Nesta Vaga?</h5>
@@ -135,7 +135,7 @@
                     </div>
                 </div>
             {% elif user.is_candidate and not job.is_active %}
-                <!-- Aviso para vagas inativas -->
+          
                 <div class="card shadow mb-4">
                     <div class="card-header bg-warning text-dark">
                         <h5 class="mb-0">Vaga Indisponível</h5>
@@ -147,7 +147,7 @@
                 </div>
             {% endif %}
             
-            <!-- Informação da Vaga -->
+    
             <div class="card shadow">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">Informações da Vaga</h5>
@@ -186,13 +186,13 @@
 </div>
 
 <script>
-    // Aplicar classes Bootstrap aos inputs do formulário
+
     document.addEventListener('DOMContentLoaded', function() {
         if (document.querySelector('textarea[name="cover_letter"]')) {
             document.querySelector('textarea[name="cover_letter"]').classList.add('form-control');
         }
         
-        // Ajustar tamanhos dos ícones
+        
         document.querySelectorAll('.feather-small').forEach(icon => {
             icon.setAttribute('width', '16');
             icon.setAttribute('height', '16');

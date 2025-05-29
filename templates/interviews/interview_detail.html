@@ -149,7 +149,7 @@
             </div>
         </div>
         
-        <!-- Barra lateral com Calendário ou Informações de Status -->
+     
         <div class="col-md-4">
             <div class="card shadow mb-4">
                 <div class="card-header bg-primary text-white">
@@ -174,7 +174,7 @@
                     
                     <hr>
                     
-                    <!-- Contagem Regressiva para a Entrevista / Status -->
+               
                     {% if interview.status == 'SCHEDULED' %}
                         <div class="text-center mt-3">
                             {% if interview.is_past %}
@@ -219,7 +219,7 @@
                 </div>
             </div>
             
-            <!-- Para recrutadores: ações rápidas -->
+    
             {% if is_recruiter and interview.status == 'SCHEDULED' %}
                 <div class="card shadow">
                     <div class="card-header bg-light">
@@ -244,7 +244,7 @@
     </div>
 </div>
 
-<!-- Script de Contagem Regressiva -->
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const countdownElement = document.querySelector('.countdown-timer');
@@ -272,7 +272,7 @@
             }
             
             updateCountdown();
-            setInterval(updateCountdown, 60000); // Atualiza a cada minuto
+            setInterval(updateCountdown, 60000); 
         }
     });
 </script>

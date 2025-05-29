@@ -5,13 +5,13 @@ Django settings for recruitment_system project.
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = 'django-insecure-xz7)4a7@8l#d=5-13g-^wdl+b9n7p6(7=b&r-c0)p8)t!@#a!k'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = [
@@ -23,7 +23,7 @@ ALLOWED_HOSTS = [
     '.repl.co'
 ]
 
-# Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Our apps
+    
     'users.apps.UsersConfig',
     'jobs.apps.JobsConfig',
     'interviews.apps.InterviewsConfig',
@@ -67,8 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'recruitment_system.wsgi.application'
 
-# Database
-# Configuração para usar o SQLite
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -76,7 +75,6 @@ DATABASES = {
     }
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -92,25 +90,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Custom user model
+
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# Login settings
+
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = 'login'  # Adicionado para redirecionar após o logout
+LOGOUT_REDIRECT_URL = 'login'  
 
-# Internationalization
+
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Default primary key field type
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

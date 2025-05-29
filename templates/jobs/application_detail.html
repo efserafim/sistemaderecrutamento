@@ -129,7 +129,7 @@
                         </div>
                     {% endif %}
                     
-                    <!-- Seção de Entrevistas -->
+                
                     {% if application.interviews.exists %}
                         <div class="mb-4">
                             <h5 class="border-bottom pb-2">
@@ -201,7 +201,7 @@
             </div>
         </div>
         
-        <!-- Barra lateral para Atualizações de Status (Somente Recrutadores) -->
+       
         {% if is_recruiter %}
             <div class="col-md-4">
                 <div class="card shadow mb-4">
@@ -303,20 +303,20 @@
     </div>
 </div>
 
-<!-- Aplicar classes do Bootstrap aos elementos do formulário -->
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Adicionar classes do Bootstrap aos campos de seleção do formulário
+        
         document.querySelectorAll('select').forEach(function(select) {
             select.classList.add('form-select');
         });
         
-        // Adicionar classes do Bootstrap aos campos de texto do formulário
+        
         document.querySelectorAll('textarea').forEach(function(textarea) {
             textarea.classList.add('form-control');
         });
         
-        // Ajustar tamanhos dos ícones
+        
         document.querySelectorAll('.feather-small').forEach(icon => {
             icon.setAttribute('width', '16');
             icon.setAttribute('height', '16');

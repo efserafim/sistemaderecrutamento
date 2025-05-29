@@ -21,7 +21,7 @@
             </h1>
             
             {% if not is_my_jobs %}
-                <!-- Search and Filter Form -->
+              
                 <div class="card shadow mb-4">
                     <div class="card-body">
                         <form method="GET" action="{% url 'job_list' %}" class="row g-3">
@@ -141,7 +141,7 @@
         {% endfor %}
     </div>
     
-    <!-- Pagination -->
+
     {% if is_paginated %}
     <div class="row">
         <div class="col-md-12">
@@ -212,7 +212,7 @@
 </div>
 
 <script>
-    // Adjust icon sizes
+
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.feather-small').forEach(icon => {
             icon.setAttribute('width', '16');
