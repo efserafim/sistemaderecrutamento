@@ -147,10 +147,10 @@
                                         <div class="d-flex w-100 justify-content-between">
                                             <h6 class="mb-1">{{ interview.get_interview_type_display }}</h6>
                                             <span class="badge 
-                                                {% if interview.status == 'SCHEDULED' %}bg-primary
-                                                {% elif interview.status == 'COMPLETED' %}bg-success
-                                                {% elif interview.status == 'CANCELED' %}bg-danger
-                                                {% elif interview.status == 'RESCHEDULED' %}bg-warning
+                                                {% if interview.status == 'Agendado' %}bg-primary
+                                                {% elif interview.status == 'Completo' %}bg-success
+                                                {% elif interview.status == 'Cancelado' %}bg-danger
+                                                {% elif interview.status == 'Reagendado' %}bg-warning
                                                 {% endif %}">
                                                 {{ interview.get_status_display }}
                                             </span>
